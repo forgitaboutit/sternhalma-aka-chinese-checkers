@@ -383,7 +383,7 @@ function getPossibleMoves(startRow, startCol) {
     playerNum = game.whoseTurn;
     landsInEnemyZone = false;
 
-    if(endZoneNum !== null && playerNum !== endZoneNum && playerNum !== endZoneNum + 2 % 6 + 1) {
+    if(endZoneNum !== null && playerNum !== endZoneNum && playerNum !== (endZoneNum + 2) % 6 + 1) {
       landsInEnemyZone = true;
     }
 
