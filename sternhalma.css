@@ -1,0 +1,76 @@
+#title {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+.side-by-side-ctr > div {
+  float: left;
+  margin-left: 20px;
+}
+
+#table-based-board {
+}
+
+#table-based-board td {
+  background-color: #dadada;
+  text-align: center;
+  height: 50px;
+  width: 50px;
+}
+
+#table-based-board td.in-end-zone {
+  background-color: gray;
+}
+#table-based-board td.out-of-bounds {
+  background-color: white;
+  visibility: hidden;
+}
+
+#table-based-board td.human {
+}
+
+#table-based-board td.selected-piece {
+  color: white;
+}
+
+#progress-tracker td.player-1,
+#table-based-board td.player-1 {
+  background-color: purple;
+}
+
+#progress-tracker td.player-2,
+#table-based-board td.player-2 {
+  background-color: gold;
+}
+
+#progress-tracker td.player-3,
+#table-based-board td.player-3 {
+  background-color: red;
+}
+
+#progress-tracker td.player-4,
+#table-based-board td.player-4 {
+  background-color: blue;
+}
+
+#progress-tracker td.player-5,
+#table-based-board td.player-5 {
+  background-color: lightBlue; 
+}
+
+#progress-tracker td.player-6,
+#table-based-board td.player-6 {
+  background-color: navy;
+}
+
+td.progress-score {
+  width: 30px;
+  background: #dadada;
+}
+#progress-tracker {
+  font-size: 20px;
+}
+
+#progress-tracker td {
+  padding: 10px;
+  text-align: center;
+}
