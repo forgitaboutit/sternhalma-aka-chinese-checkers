@@ -99,6 +99,8 @@ function displayBoard(board) {
       td.css('cursor', 'pointer');
 
       td.bind('click', function() {
+        
+        if(game.winner !== null) return;
 
         // Selecting a destination for the selected piece
         if(game.selectedPiece !== null && $(this).hasClass('player') === false) {
@@ -580,7 +582,6 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
 
   let possibleActions = [...getPossibleMoves(startRow, startCol),
                          ...getPossibleJumps([{row: startRow, col: startCol}], startRow, startCol)];
-  let playerNum;
 
   for(let ctr = 0; ctr < possibleActions.length; ctr++) {
 
