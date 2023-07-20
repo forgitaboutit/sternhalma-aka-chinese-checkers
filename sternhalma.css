@@ -11,6 +11,10 @@
 
 /**********both boards************/
 
+#array-board {
+  font-size: 20px;
+}
+
 #normal-board {
   text-align: center;
   margin-left: auto;
