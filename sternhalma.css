@@ -13,11 +13,11 @@
 
 #array-board {
   font-size: 20px;
+  margin-left: 30px;
 }
 
 #normal-board {
   text-align: center;
-  margin-left: 30px;
 }
 
 #normal-board .row {
