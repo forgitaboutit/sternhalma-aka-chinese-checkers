@@ -18,6 +18,8 @@
 
 #normal-board {
   text-align: center;
+  margin-left: 30px;
+  margin-bottom: 30px;
 }
 
 #normal-board .row {
