@@ -1,76 +1,126 @@
+/*****sternhalma.css*****/
+
 #title {
   font-size: 28px;
   margin-bottom: 10px;
-}
-.side-by-side-ctr > div {
-  float: left;
-  margin-left: 20px;
-}
-
-#table-based-board {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 500px;
 }
 
-#table-based-board td {
+/**********both boards************/
+
+#normal-board {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#normal-board .row {
+  text-align: center;
+  height: 50px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#array-board td,
+div.normal-board-cell {
   background-color: #dadada;
   text-align: center;
   height: 50px;
   width: 50px;
 }
 
-#table-based-board td.in-end-zone {
+div.normal-board-cell {
+  float: left;
+  border-radius: 50%;
+  margin-left: 2.5px;
+  margin-right: 2.5px;
+}
+
+#array-board td.in-end-zone,
+div.in-end-zone {
   background-color: gray;
 }
-#table-based-board td.out-of-bounds {
+
+#array-board td.out-of-bounds {
   background-color: white;
   visibility: hidden;
 }
-
-#table-based-board td.human {
+div.out-of-bounds {
+  display: none;
 }
 
-#table-based-board td.selected-piece {
+#array-board td.selected-piece {
   color: white;
 }
+#normal-board div div.selected-piece {
+  background-color: #39ff14;
+}
 
-#progress-tracker td.player-1,
-#table-based-board td.player-1 {
+/************progress tracker*****************/
+
+#progress-tracker {
+  font-size: 20px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#progress-tracker th.player-1,
+#array-board td.player-1,
+#normal-board div.player-1 {
   background-color: purple;
 }
 
-#progress-tracker td.player-2,
-#table-based-board td.player-2 {
+#progress-tracker th.player-2,
+#array-board td.player-2,
+#normal-board div.player-2 {
   background-color: gold;
 }
 
-#progress-tracker td.player-3,
-#table-based-board td.player-3 {
+#progress-tracker th.player-3,
+#array-board td.player-3,
+#normal-board div.player-3 {
   background-color: red;
 }
 
-#progress-tracker td.player-4,
-#table-based-board td.player-4 {
+#progress-tracker th.player-4,
+#array-board td.player-4,
+#normal-board div.player-4 {
   background-color: blue;
 }
 
-#progress-tracker td.player-5,
-#table-based-board td.player-5 {
+#progress-tracker th.player-5,
+#array-board td.player-5,
+#normal-board div.player-5 {
   background-color: #00a0f0; 
 }
 
-#progress-tracker td.player-6,
-#table-based-board td.player-6 {
+#progress-tracker th.player-6,
+#array-board td.player-6,
+#normal-board div.player-6 {
   background-color: navy;
 }
 
-td.progress-score {
+.progress-score {
   width: 30px;
   background: #dadada;
 }
-#progress-tracker {
-  font-size: 20px;
-}
 
+#progress-tracker th,
 #progress-tracker td {
   padding: 10px;
   text-align: center;
+}
+
+/**************etc.***************/
+
+.clear {
+  clear: both;
+}
+
+.side-by-side-ctr > div {
+  float: left;
 }

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>Sternhalma</title>
+  <title>sternhalma</title>
   <link rel='stylesheet' href='/sternhalma-aka-chinese-checkers/sternhalma.css'>
   <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js"
           integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE="
@@ -12,27 +12,42 @@
 <body>
 
   <div id='title'><strong>Sternhalma aka Chinese Checkers</strong></div>
-  
-  <div class='side-by-side-ctr'>
+
+  <div>
+
+    <table id='progress-tracker'>
+      <thead>
+        <tr>
+          <th class='player-1'>p1</th>
+          <th class='player-2'>p2</th>
+          <th class='player-3'>p3</th>
+          <th class='player-4'>p4</th>
+          <th class='player-5'>p5</th>
+          <th class='player-6'>p6</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class='progress-score' id='progress-player-1'>0</td>
+          <td class='progress-score' id='progress-player-2'>0</td>
+          <td class='progress-score' id='progress-player-3'>0</td>
+          <td class='progress-score' id='progress-player-4'>0</td>
+          <td class='progress-score' id='progress-player-5'>0</td>
+          <td class='progress-score' id='progress-player-6'>0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class='clear'></div>
+
+  <div id='boards-ctr' class='side-by-side-ctr'>
 
     <div>
-      <table id='progress-tracker'>
-        <thead>
-          <tr><td colspan='2' align='center'><strong>progress</strong></td><td>
-        </thead>
-        <tbody>
-          <tr><td class='player-1'>player 1</td> <td class='progress-score' id='progress-player-1'>0</td></div></tr>
-          <tr><td class='player-2'>player 2</td> <td class='progress-score' id='progress-player-2'>0</td></div></tr>
-          <tr><td class='player-3'>player 3</td> <td class='progress-score' id='progress-player-3'>0</td></div></tr>
-          <tr><td class='player-4'>player 4</td> <td class='progress-score' id='progress-player-4'>0</td></div></tr>
-          <tr><td class='player-5'>player 5</td> <td class='progress-score' id='progress-player-5'>0</td></div></tr>
-          <tr><td class='player-6'>player 6</td> <td class='progress-score' id='progress-player-6'>0</td></div></tr>
-        </tbody>
-      </table>
+      <table id='array-board'></table>
     </div>
 
     <div>
-      <table id='table-based-board'></table>
+      <div id='normal-board'></div>
     </div>
 
   </div>

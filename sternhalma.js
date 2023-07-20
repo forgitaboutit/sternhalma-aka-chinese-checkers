@@ -2,15 +2,15 @@
  * Sternhalma
  * @author Stepan Fyodorovic
  * @description Sternhalma aka Chinese Checkers (1 human vs 5 AI)
- * @version 1.5.1
+ * @version 1.5.2
  */
 
 let game; // state of game
 
 $(function() {
 
-  game = initializeGameStructure();
-  displayBoard(game.board);
+  initializeGameStructure();
+  displayBoards();
 });
 
 function initializeGameStructure() {
@@ -73,104 +73,130 @@ function initializeGameStructure() {
   return game;
 }
 
-function displayBoard(board) {
+function displayBoards() {
 
-  let table = $('#table-based-board');
-  let cell, row, col, tr, td;
+  let board = game.board, cell, row, col;
+  let arrayBoard = $('#array-board'), tr, td;
+  let normalBoard = $('#normal-board'), divRow, divCell;
+  let validCellsThisRow;
+  const widthPerCell = 55; // 50px + (2 * 2.5px)
 
-  for(row = 0; row < board.length; row++) {
+  for(row = 0; row < 17; row++) {
   
-    tr = $('<tr id="row-' + row + '"></tr>');
+    validCellsThisRow = 0;
+
+    tr = $('<tr id="array-board-row-' + row + '"></tr>');
+    divRow = $('<div class="row row-' + row + '"></div>');
 
     for(col = 0; col < board[row].length; col++) {
       
       cell = board[row][col];
       
-      td = $('<td id="' + row + 'x' + col + '">' + row + ',' + col + '</td>');
+      td = $('<td id="array-board-' + row + 'x' + col + '">' + row + ',' + col + '</td>');
+      divCell = $('<div id="normal-board-' + row + 'x' + col + '" class="normal-board-cell"></div>');
       
       if(cell.inBounds === false) {
+
         td.addClass('out-of-bounds');
+        divCell.addClass('out-of-bounds');
       }
-      else if(cell.playerNum > 0) {
+      else {
 
-        td.addClass('player player-' + cell.playerNum);
+        validCellsThisRow++;
+
+        td.css('cursor', 'pointer');
+        divCell.css('cursor', 'pointer');
+
+        td.bind('click', processAction);
+        divCell.bind('click', processAction);
+
+        if(cell.playerNum > 0) {
+
+          td.addClass('player player-' + cell.playerNum);
+          divCell.addClass('player player-' + cell.playerNum);
+        }
       }
-
-      td.css('cursor', 'pointer');
-
-      td.bind('click', function() {
-        
-        if(game.winner !== null) return;
-
-        // Selecting a destination for the selected piece
-        if(game.selectedPiece !== null && $(this).hasClass('player') === false) {
-
-          let startRow, startCol, endRow, endCol;
-          
-          let selectedPiece = game.selectedPiece.split('x');
-          startRow = parseInt(selectedPiece[0]);
-          startCol = parseInt(selectedPiece[1]);
-
-          let targetSpace = $(this).prop('id').split('x');
-          endRow = parseInt(targetSpace[0]);
-          endCol = parseInt(targetSpace[1]);
-
-          if(destinationIsValid(startRow, startCol, endRow, endCol)) {
-
-            if(game.whoseTurn === null) { // opening move
-              game.whoseTurn = game.board[startRow][startCol].playerNum;
-              game.human = game.board[startRow][startCol].playerNum;
-            }
-
-            executeAction(startRow, startCol, endRow, endCol);
-            
-            let interval_ID = setInterval(function() {
-
-              game.possibleJumps = [];
-
-              if(advanceTurn() !== game.human && game.winner === null) {
-                moveAI();
-              }
-              else {
-                clearInterval(interval_ID);
-              }
-            }, 1000);
-          }
-          return;
-        }
-
-        // Deselection
-        if($(this).hasClass('selected-piece')) {
-
-          game.selectedPiece = null;
-          $(this).removeClass('selected-piece');
-          return;
-        }
-
-        // Selection
-        if($(this).hasClass('player')) {
-
-          if((game.whoseTurn === game.human && $(this).hasClass('player-' + game.human)) ||
-              game.whoseTurn === null)
-          {
-
-            if(game.selectedPiece !== null) { // Reselection
-              $('#' + game.selectedPiece).removeClass('selected-piece');
-            }
-
-            game.selectedPiece = $(this).prop('id');
-            $(this).addClass('selected-piece');
-          }
-
-          return;
-        }
-      });
-
       tr.append(td);
+      divRow.append(divCell);
     }
-    table.append(tr);
+    arrayBoard.append(tr);
+    divRow.css('width', (validCellsThisRow * widthPerCell) + 'px');
+    normalBoard.append(divRow);
   }
 }
+
+let processAction = function() {
+
+  if(game.winner !== null) return;
+
+  // Selecting a destination for the selected piece
+  if(game.selectedPiece !== null && $(this).hasClass('player') === false) {
+
+    let startRow, startCol, endRow, endCol;
+    
+    let selectedPiece = game.selectedPiece.split('x');
+    startRow = parseInt(selectedPiece[0]);
+    startCol = parseInt(selectedPiece[1]);
+
+    let targetSpace = $(this).prop('id').match(/\d+x\d+$/)[0].split('x');
+    endRow = parseInt(targetSpace[0]);
+    endCol = parseInt(targetSpace[1]);
+
+    if(destinationIsValid(startRow, startCol, endRow, endCol)) {
+
+      if(game.whoseTurn === null) { // opening move
+        game.whoseTurn = game.board[startRow][startCol].playerNum;
+        game.human = game.board[startRow][startCol].playerNum;
+      }
+
+      executeAction(startRow, startCol, endRow, endCol);
+      
+      let interval_ID = setInterval(function() {
+
+        game.possibleJumps = [];
+
+        if(advanceTurn() !== game.human && game.winner === null) {
+          moveAI();
+        }
+        else {
+          clearInterval(interval_ID);
+        }
+      }, 1000);
+    }
+    return;
+  }
+
+  // Deselection
+  if($(this).hasClass('selected-piece')) {
+
+    $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
+    $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+
+    game.selectedPiece = null;
+
+    return;
+  }
+
+  // Selection
+  if($(this).hasClass('player')) {
+
+    if((game.whoseTurn === game.human && $(this).hasClass('player-' + game.human)) ||
+        game.whoseTurn === null)
+    {
+
+      if(game.selectedPiece !== null) { // Reselection
+        $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
+        $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+      }
+
+      game.selectedPiece = $(this).prop('id').match(/\d+x\d+$/)[0];
+      $('#array-board-' + game.selectedPiece).addClass('selected-piece');
+      $('#normal-board-' + game.selectedPiece).addClass('selected-piece');
+    }
+
+    return;
+  }
+};
 
 function executeAction(startRow, startCol, endRow, endCol) {
 
@@ -183,9 +209,12 @@ function executeAction(startRow, startCol, endRow, endCol) {
   startCell.playerNum = null;
   game.selectedPiece = null;
 
-  // Move piece
-  $('#' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
-  $('#' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
+  // Move pieces
+  $('#array-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
+  $('#normal-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
+
+  $('#array-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
+  $('#normal-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
 
   // Update player's progress
   game.progress[playerNum] += calculateProgress(startRow, startCol, endRow, endCol);
@@ -582,6 +611,7 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
 
   let possibleActions = [...getPossibleMoves(startRow, startCol),
                          ...getPossibleJumps([{row: startRow, col: startCol}], startRow, startCol)];
+  let playerNum;
 
   for(let ctr = 0; ctr < possibleActions.length; ctr++) {
 
