@@ -6,7 +6,12 @@
   <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js"
           integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE="
           crossorigin="anonymous"></script>
-	<script src='/sternhalma-aka-chinese-checkers/sternhalma.js'></script>
+  <script src='/sternhalma-aka-chinese-checkers/sternhalma.js'></script>
+  <!--The following are for highlighting the JavaScript code displayed on the page-->
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css'>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js'></script>
+  <script>hljs.highlightAll();</script>
 </head>
 
 <body>
@@ -50,6 +55,712 @@
       <table id='array-board'></table>
     </div>
 
+  </div>
+
+  <div>
+    <pre><code class='language-javascript'>
+/**
+ * Sternhalma
+ * @author Stepan Fyodorovic
+ * @description Sternhalma aka Chinese Checkers (1 human vs 5 AI)
+ * @version 1.5.2
+ */
+
+let game; // state of game
+
+$(function() {
+
+  initializeGameStructure();
+  displayBoards();
+});
+
+function initializeGameStructure() {
+
+  let board = [], cell = {}, piece = {}, endZoneNum;
+
+  // Track locations of pieces by player for fast lookup
+  let pieces = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+
+  // Track progress of each player
+  let progress = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
+
+  game =  {
+    human: null,
+    whoseTurn: null,
+    winner: null,
+    selectedPiece: null,
+    possibleJumps: null,
+    numTurns: 0,
+    pieces: pieces,
+    progress: progress
+  };
+
+  for(let row = 0; row &lt;= 16; row++) {
+
+    board[row] = [];
+
+    for(let col = 0; col &lt;= 16; col++) {
+
+      cell = {
+        row: row,
+        col: col,
+        playerNum: null,
+        endZoneNum: null
+      };
+
+      cell.inBounds = inBounds(row, col);
+
+      if(cell.inBounds) {
+
+        endZoneNum = endZone(row, col);
+
+        if(endZoneNum !== null) {
+
+          cell.endZoneNum = endZoneNum;
+
+          // Player num is across from end zone num
+          cell.playerNum = (endZoneNum + 2) % 6 + 1;
+
+          piece = { row: row, col: col }
+          pieces[cell.playerNum][pieces[cell.playerNum].length] = piece;
+        }
+      }
+      board[row][col] = cell;
+    }
+  }
+  game.board = board;
+  game.pieces = pieces;
+
+  return game;
+}
+
+function displayBoards() {
+
+  let board = game.board, cell, row, col;
+  let arrayBoard = $('#array-board'), tr, td;
+  let normalBoard = $('#normal-board'), divRow, divCell;
+  let validCellsThisRow;
+  const widthPerCell = 55; // 50px + (2 * 2.5px)
+
+  for(row = 0; row &lt; 17; row++) {
+
+    validCellsThisRow = 0;
+
+    tr = $('&lt;tr id=&quot;array-board-row-' + row + '&quot;&gt;&lt;/tr&gt;');
+    divRow = $('&lt;div class=&quot;row row-' + row + '&quot;&gt;&lt;/div&gt;');
+
+    for(col = 0; col &lt; board[row].length; col++) {
+
+      cell = board[row][col];
+
+      td = $('&lt;td id=&quot;array-board-' + row + 'x' + col + '&quot;&gt;' + row + ',' + col + '&lt;/td&gt;');
+      divCell = $('&lt;div id=&quot;normal-board-' + row + 'x' + col + '&quot; class=&quot;normal-board-cell&quot;&gt;&lt;/div&gt;');
+
+      if(cell.inBounds === false) {
+
+        td.addClass('out-of-bounds');
+        divCell.addClass('out-of-bounds');
+      }
+      else {
+
+        validCellsThisRow++;
+
+        td.css('cursor', 'pointer');
+        divCell.css('cursor', 'pointer');
+
+        td.bind('click', processAction);
+        divCell.bind('click', processAction);
+
+        if(cell.playerNum &gt; 0) {
+
+          td.addClass('player player-' + cell.playerNum);
+          divCell.addClass('player player-' + cell.playerNum);
+        }
+      }
+      tr.append(td);
+      divRow.append(divCell);
+    }
+    arrayBoard.append(tr);
+    divRow.css('width', (validCellsThisRow * widthPerCell) + 'px');
+    normalBoard.append(divRow);
+  }
+}
+
+let processAction = function() {
+
+  if(game.winner !== null) return;
+
+  // Selecting a destination for the selected piece
+  if(game.selectedPiece !== null &amp;&amp; $(this).hasClass('player') === false) {
+
+    let startRow, startCol, endRow, endCol;
+
+    let selectedPiece = game.selectedPiece.split('x');
+    startRow = parseInt(selectedPiece[0]);
+    startCol = parseInt(selectedPiece[1]);
+
+    let targetSpace = $(this).prop('id').match(/\d+x\d+$/)[0].split('x');
+    endRow = parseInt(targetSpace[0]);
+    endCol = parseInt(targetSpace[1]);
+
+    if(destinationIsValid(startRow, startCol, endRow, endCol)) {
+
+      if(game.whoseTurn === null) { // opening move
+        game.whoseTurn = game.board[startRow][startCol].playerNum;
+        game.human = game.board[startRow][startCol].playerNum;
+      }
+
+      executeAction(startRow, startCol, endRow, endCol);
+
+      let interval_ID = setInterval(function() {
+
+        game.possibleJumps = [];
+
+        if(advanceTurn() !== game.human &amp;&amp; game.winner === null) {
+          moveAI();
+        }
+        else {
+          clearInterval(interval_ID);
+        }
+      }, 1000);
+    }
+    return;
+  }
+
+  // Deselection
+  if($(this).hasClass('selected-piece')) {
+
+    $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
+    $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+
+    game.selectedPiece = null;
+
+    return;
+  }
+
+  // Selection
+  if($(this).hasClass('player')) {
+
+    if((game.whoseTurn === game.human &amp;&amp; $(this).hasClass('player-' + game.human)) ||
+        game.whoseTurn === null)
+    {
+
+      if(game.selectedPiece !== null) { // Reselection
+        $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
+        $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+      }
+
+      game.selectedPiece = $(this).prop('id').match(/\d+x\d+$/)[0];
+      $('#array-board-' + game.selectedPiece).addClass('selected-piece');
+      $('#normal-board-' + game.selectedPiece).addClass('selected-piece');
+    }
+
+    return;
+  }
+};
+
+function executeAction(startRow, startCol, endRow, endCol) {
+
+  let startCell = game.board[startRow][startCol];
+  let endCell = game.board[endRow][endCol];
+  let playerNum = startCell.playerNum;
+  let pieces = game.pieces[playerNum];
+
+  endCell.playerNum = playerNum;
+  startCell.playerNum = null;
+  game.selectedPiece = null;
+
+  // Move pieces
+  $('#array-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
+  $('#normal-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
+
+  $('#array-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
+  $('#normal-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
+
+  // Update player's progress
+  game.progress[playerNum] += calculateProgress(startRow, startCol, endRow, endCol);
+  $('#progress-player-' + playerNum).html(game.progress[playerNum]);
+
+  // Update pieces structure.
+  for(let ctr = 0; ctr &lt; pieces.length; ctr++) {
+
+    if(pieces[ctr].row == startRow &amp;&amp; pieces[ctr].col == startCol) {
+
+      pieces[ctr].row = endRow;
+      pieces[ctr].col = endCol;
+      return;
+    }
+  }
+}
+
+function moveAI() {
+
+  let pieces = game.pieces[game.whoseTurn];
+  let possibleMovesOnePiece = [], possibleJumpsOnePiece = [];
+  let possibleActions = [], actionIndex, action;
+  let candidatesOfMaxProgress = [], maxProgress, foundTheActions;
+
+  // Get possible actions for all 10 pieces into an array
+  for(let ctr = 0; ctr &lt; pieces.length; ctr++) {
+
+    possibleMovesOnePiece = getPossibleMoves(pieces[ctr].row, pieces[ctr].col);
+    possibleJumpsOnePiece = getPossibleJumps([{row: pieces[ctr].row, col: pieces[ctr].col}], pieces[ctr].row, pieces[ctr].col);
+    possibleActions.push(...possibleMovesOnePiece, ...possibleJumpsOnePiece);
+  }
+
+  // Reorder actions based on progress value
+  sortByProgressQuicksort(possibleActions, 0, possibleActions.length - 1);
+
+  // Moves with highest progress will be at the highest indices
+  actionIndex = possibleActions.length - 1;
+  maxProgress = possibleActions[actionIndex].progress;
+
+  // Iterate backwards until eligible move(s) of max progress have been found
+  foundTheActions = false;
+
+  while(foundTheActions === false) {
+
+    if(possibleActions[actionIndex].progress === maxProgress) {
+
+      if(possibleActions[actionIndex].landsInEnemyZone === false) {
+
+        candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
+      }
+    }
+    else {
+
+      // Termination condition
+      if(candidatesOfMaxProgress.length &gt; 0) {
+        foundTheActions = true;
+      }
+      else {
+
+        // No valid candidates at this progress level (all landed in enemy zones)
+        // Continue with new (lower) progress level
+        maxProgress = possibleActions[actionIndex].progress;
+
+        if(possibleActions[actionIndex].landsInEnemyZone === false) {
+
+          candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
+        }
+      }
+    }
+    actionIndex--;
+  }
+
+  // Choose randomly from moves of equal progress
+  action = candidatesOfMaxProgress[Math.floor(Math.random() * candidatesOfMaxProgress.length)];
+
+  executeAction(action.startRow, action.startCol, action.endRow, action.endCol);
+
+  return;
+}
+
+/**
+ * @description
+ * - Implementation of quicksort
+ * - Hoare partition scheme chosen because it performs well with repeated values
+ * - Actions are sorted according to progress
+ * - Moves have progress values of -1, 0 and 1
+ * - Jumps have even-numbered progress values from -16 to 16
+*/
+function sortByProgressQuicksort(actionsArray, startIndex, endIndex) {
+
+  let pivotIndex;
+
+  if(startIndex &gt;= 0 &amp;&amp; endIndex &gt;= 0 &amp;&amp; startIndex &lt; endIndex) {
+
+    pivotIndex = partition(actionsArray, startIndex, endIndex);
+    sortByProgressQuicksort(actionsArray, startIndex, pivotIndex);
+    sortByProgressQuicksort(actionsArray, pivotIndex + 1, endIndex);
+  }
+}
+
+function partition(actionsArray, startIndex, endIndex) {
+
+  let pivotValue = actionsArray[Math.floor((endIndex - startIndex) / 2) + startIndex].progress;
+  let leftIndex = startIndex - 1;
+  let rightIndex = endIndex + 1;
+  let actionHolder;
+
+  while(true) {
+
+    do { leftIndex++; } while(actionsArray[leftIndex].progress &lt; pivotValue);
+    do { rightIndex--; } while(actionsArray[rightIndex].progress &gt; pivotValue);
+
+    if(leftIndex &gt;= rightIndex) return rightIndex;
+
+    // Swap actionsArray[leftIndex] with actionsArray[rightIndex]
+    actionHolder = actionsArray[leftIndex];
+    actionsArray[leftIndex] = actionsArray[rightIndex];
+    actionsArray[rightIndex] = actionHolder;
+  }
+}
+
+function calculateProgress(startRow, startCol, endRow, endCol) {
+
+  switch(game.whoseTurn) {
+
+    case 1: return (endRow - startRow);
+    case 2: return (endRow - startRow) - (endCol - startCol);
+    case 3: return -(endCol - startCol);
+    case 4: return -(endRow - startRow);
+    case 5: return (endCol - startCol) - (endRow - startRow);
+    case 6: return (endCol - startCol);
+  }
+}
+
+function advanceTurn() {
+
+  game.numTurns++;
+
+  if(winnerIs() === null) {
+    return game.whoseTurn = game.whoseTurn % 6 + 1; // clockwise
+  }
+  game.winner = game.whoseTurn;
+  return game.whoseTurn = null;
+}
+
+function winnerIs() {
+
+  let pieces = game.pieces[game.whoseTurn];
+  let endZoneNum;
+
+  if(game.progress[game.whoseTurn] !== 120) {
+    return null;
+  }
+
+  $('td#progress-player-' + game.whoseTurn).css('background', '#39ff14');
+
+  return game.whoseTurn;
+}
+
+function getPossibleMoves(startRow, startCol) {
+
+  let cells = [], cell;
+  let possibleMoves = [];
+  let endZoneNum, playerNum, landsInEnemyZone;
+
+  // 1. Check above cell
+  if(startRow &gt; 0) {
+
+    cell = game.board[startRow - 1][startCol];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  // 2. Check right cell
+  if(startCol &lt; 16) {
+
+    cell = game.board[startRow][startCol + 1];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  // 3. Check lower-right cell
+  if(startRow &lt; 16 &amp;&amp; startCol &lt; 16) {
+
+    cell = game.board[startRow + 1][startCol + 1];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  // 4. Check below cell
+  if(startRow &lt; 16) {
+
+    cell = game.board[startRow + 1][startCol];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  // 5. Check left cell
+  if(startCol &gt; 0) {
+
+    cell = game.board[startRow][startCol - 1];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  // 6. Check upper-left cell
+  if(startCol &gt; 0 &amp;&amp; startRow &gt; 0) {
+
+    cell = game.board[startRow - 1][startCol - 1];
+
+    if(cell.playerNum === null &amp;&amp; cell.inBounds === true) {
+      cells[cells.length] = cell;
+    }
+  }
+
+  for(let ctr = 0; ctr &lt; cells.length; ctr++) {
+
+    endZoneNum = endZone(cells[ctr].row, cells[ctr].col);
+    playerNum = game.whoseTurn;
+    landsInEnemyZone = false;
+
+    if(endZoneNum !== null &amp;&amp; playerNum !== endZoneNum &amp;&amp; playerNum !== (endZoneNum + 2) % 6 + 1) {
+      landsInEnemyZone = true;
+    }
+
+    possibleMoves[possibleMoves.length] = {
+      startRow: startRow,
+      startCol: startCol,
+      endRow: cells[ctr].row,
+      endCol: cells[ctr].col,
+      progress: calculateProgress(startRow, startCol, cells[ctr].row, cells[ctr].col),
+      landsInEnemyZone: landsInEnemyZone
+    };
+  }
+
+  return possibleMoves;
+}
+
+function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
+
+  // Reset master list for ignoring duplicate jumps
+  if(startingPoints[0].row === originalStartRow &amp;&amp;
+     startingPoints[0].col === originalStartCol) {
+
+    game.possibleJumps = [];
+  }
+
+  let startRow, startCol;
+  let outerCtr, innerCtr, jumpCtr;
+  let landingCells = [], newStartingPoints = [], landingCell, adjacentCell;
+  let possibleJumps = [], jump, existingJump, jumpAlreadyThere, landsInEnemyZone;
+  let endZoneNum, playerNum;
+
+  for(let outerCtr = 0; outerCtr &lt; startingPoints.length; outerCtr++) {
+
+    startRow = startingPoints[outerCtr].row;
+    startCol = startingPoints[outerCtr].col;
+
+    // 1. Check 2 cells above
+    if(startRow &gt; 1) {
+
+      adjacentCell = game.board[startRow - 1][startCol];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow - 2][startCol];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    // 2. Check 2 cells to the right
+    if(startCol &lt; 15) {
+
+      adjacentCell = game.board[startRow][startCol + 1];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow][startCol + 2];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    // 3. Check 2 cells to the lower-right
+    if(startRow &lt; 15 &amp;&amp; startCol &lt; 15) {
+
+      adjacentCell = game.board[startRow + 1][startCol + 1];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow + 2][startCol + 2];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    // 4. Check 2 cells below
+    if(startRow &lt; 15) {
+
+      adjacentCell = game.board[startRow + 1][startCol];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow + 2][startCol];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    // 5. Check 2 cells to the left
+    if(startCol &gt; 1) {
+
+      adjacentCell = game.board[startRow][startCol - 1];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow][startCol - 2];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    // 6. Check 2 cells to the upper-left
+    if(startCol &gt; 1 &amp;&amp; startRow &gt; 1) {
+
+      adjacentCell = game.board[startRow - 1][startCol - 1];
+
+      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum !== null) {
+
+        landingCell = game.board[startRow - 2][startCol - 2];
+
+        if(landingCell.inBounds &amp;&amp; landingCell.playerNum === null) {
+
+          landingCells[landingCells.length] = landingCell;
+        }
+      }
+    }
+
+    for(innerCtr = 0; innerCtr &lt; landingCells.length; innerCtr++) {
+
+      landingCell = landingCells[innerCtr];
+
+      jumpAlreadyThere = false;
+      landsInEnemyZone = false;
+
+      // Ignore duplicate destinations
+      for(jumpCtr = 0; jumpCtr &lt; game.possibleJumps.length; jumpCtr++) {
+
+        existingJump = game.possibleJumps[jumpCtr];
+
+        if(existingJump.startRow === originalStartRow &amp;&amp; existingJump.endRow === landingCell.row &amp;&amp;
+           existingJump.startCol === originalStartCol &amp;&amp; existingJump.endCol === landingCell.col) {
+
+          jumpAlreadyThere = true;
+        }
+      }
+
+      if(jumpAlreadyThere === false) {
+
+        endZoneNum = endZone(landingCell.row, landingCell.col);
+        playerNum = game.board[originalStartRow][originalStartCol].playerNum;
+
+        if(endZoneNum !== null &amp;&amp; playerNum !== endZoneNum &amp;&amp; playerNum !== (endZoneNum + 2) % 6 + 1) {
+          landsInEnemyZone = true;
+        }
+
+        jump = {
+          startRow: originalStartRow,
+          startCol: originalStartCol,
+          endRow: landingCell.row,
+          endCol: landingCell.col,
+          progress: calculateProgress(originalStartRow, originalStartCol, landingCell.row, landingCell.col),
+          landsInEnemyZone: landsInEnemyZone
+        };
+
+        // Update master list for ignoring duplicate jumps
+        game.possibleJumps[game.possibleJumps.length] = jump;
+
+        // Add to return array
+        possibleJumps[possibleJumps.length] = jump;
+
+        newStartingPoints[newStartingPoints.length] = {
+          row: landingCell.row,
+          col: landingCell.col
+        };
+      }
+    }
+  }
+
+  // Termination condition
+  if(newStartingPoints.length === 0) {
+    return [];
+  }
+
+  return [...possibleJumps, ...getPossibleJumps(newStartingPoints, originalStartRow, originalStartCol)];
+}
+
+// Validate human move
+function destinationIsValid(startRow, startCol, endRow, endCol) {
+
+  let possibleActions = [...getPossibleMoves(startRow, startCol),
+                         ...getPossibleJumps([{row: startRow, col: startCol}], startRow, startCol)];
+  let playerNum;
+
+  for(let ctr = 0; ctr &lt; possibleActions.length; ctr++) {
+
+    if(possibleActions[ctr].endRow === endRow &amp;&amp;
+       possibleActions[ctr].endCol === endCol) {
+
+      if(possibleActions[ctr].landsInEnemyZone === true) {
+        return false;
+      }
+
+      return true;
+    }
+  }
+  return false;
+}
+
+function inBounds(row, col) {
+
+  if(row &lt; 4 &amp;&amp; col &lt; 4) return false; // upper left corner
+  if(row &lt; 4 &amp;&amp; col &gt; 12) return false; // upper right corner
+  if(row &gt; 12 &amp;&amp; col &gt; 12) return false; // lower right corner
+  if(row &gt; 12 &amp;&amp; col &lt; 4) return false; // lower left corner
+
+  for(let outerCtr = 0; outerCtr &lt; 4; outerCtr++) {
+
+    for(let innerCtr = 0; innerCtr &lt;= 8 - outerCtr; innerCtr++) {
+
+      if(row &lt;= outerCtr &amp;&amp; col &gt; 4 + outerCtr &amp;&amp; col &lt;= 12) return false; // upper middle
+      if(row &lt; 12 - outerCtr &amp;&amp; col &gt;= 16 - outerCtr) return false; // right middle
+      if(row &gt;= 16 - outerCtr &amp;&amp; col &gt;= 4 &amp;&amp; col &lt; 12 - outerCtr) return false; // lower middle
+      if(row &gt; 4 + outerCtr &amp;&amp; col &lt;= outerCtr) return false; // left middle
+    }
+  }
+  return true;
+}
+
+function endZone(row, col) {
+
+  for(let outerCtr = 0; outerCtr &lt; 4; outerCtr++) {
+
+    for(let innerCtr = 0; innerCtr &lt;= outerCtr; innerCtr++) {
+
+      // End zones numbered by the player across the board
+      // e.g. player 1 starts in end zone 4 and vice versa
+
+      if(row == 16 - outerCtr &amp;&amp; col == 12 - innerCtr) return 1;
+      if(row == 12 - outerCtr + innerCtr &amp;&amp; col == innerCtr + 4) return 2;
+      if(row == innerCtr + 4 &amp;&amp; col == outerCtr) return 3;
+      if(row == outerCtr &amp;&amp; col == innerCtr + 4) return 4;
+      if(row == innerCtr + 4 &amp;&amp; col == 12 - outerCtr + innerCtr) return 5;
+      if(row == 12 - innerCtr &amp;&amp; col == 16 - outerCtr) return 6;
+    }
+  }
+  return null;
+}
+    </code></pre>
   </div>
 
 </body>
