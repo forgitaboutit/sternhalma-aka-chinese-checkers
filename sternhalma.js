@@ -60,7 +60,7 @@ function initializeGameStructure() {
           // Player num is across from end zone num
           cell.playerNum = (endZoneNum + 2) % 6 + 1;
 
-          piece = { row: row, col: col }
+          piece = { row: row, col: col };
           pieces[cell.playerNum][pieces[cell.playerNum].length] = piece;
         }
       }
@@ -362,9 +362,6 @@ function advanceTurn() {
 
 function winnerIs() {
 
-  let pieces = game.pieces[game.whoseTurn];
-  let endZoneNum;
-
   if(game.progress[game.whoseTurn] !== 120) {
     return null;
   }
@@ -478,7 +475,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
   let possibleJumps = [], jump, existingJump, jumpAlreadyThere, landsInEnemyZone;
   let endZoneNum, playerNum;
 
-  for(let outerCtr = 0; outerCtr < startingPoints.length; outerCtr++) {
+  for(outerCtr = 0; outerCtr < startingPoints.length; outerCtr++) {
 
     startRow = startingPoints[outerCtr].row;
     startCol = startingPoints[outerCtr].col;
@@ -649,11 +646,7 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
     if(possibleActions[ctr].endRow === endRow &&
        possibleActions[ctr].endCol === endCol) {
 
-      if(possibleActions[ctr].landsInEnemyZone === true) {
-        return false;
-      }
-
-      return true;
+        return possibleActions[ctr].landsInEnemyZone !== true;
     }
   }
   return false;
