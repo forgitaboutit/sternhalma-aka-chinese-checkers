@@ -235,28 +235,60 @@ function executeAction(startRow, startCol, endRow, endCol) {
 function moveAI() {
 
   let pieces = game.pieces[game.whoseTurn];
-  let possibleMovesOnePiece = [], possibleJumpsOnePiece;
-  let actions = [], actionIndex, action;
+  let possibleMovesOnePiece = [], possibleJumpsOnePiece = [];
+  let possibleActions = [], actionIndex, action;
+  let candidatesOfMaxProgress = [], maxProgress, foundTheActions;
 
+  // Get possible actions for all 10 pieces into an array
   for(let ctr = 0; ctr < pieces.length; ctr++) {
 
     possibleMovesOnePiece = getPossibleMoves(pieces[ctr].row, pieces[ctr].col);
     possibleJumpsOnePiece = getPossibleJumps([{row: pieces[ctr].row, col: pieces[ctr].col}], pieces[ctr].row, pieces[ctr].col);
-    actions.push(...possibleMovesOnePiece, ...possibleJumpsOnePiece);
+    possibleActions.push(...possibleMovesOnePiece, ...possibleJumpsOnePiece);
   }
 
-  sortByDistanceGainedViaQuicksort(actions, 0, actions.length - 1);
+  // Reorder actions based on progress value
+  sortByProgressQuicksort(possibleActions, 0, possibleActions.length - 1);
 
-  // Move with highest progress will be the last item
-  // Iterate backwards until action is found that does not land in enemy zone
+  // Moves with highest progress will be at the highest indices
+  actionIndex = possibleActions.length - 1;
+  maxProgress = possibleActions[actionIndex].progress;
 
-  actionIndex = actions.length - 1;
+  // Iterate backwards until eligible move(s) of max progress have been found
+  foundTheActions = false;
 
-  while(actions[actionIndex].landsInEnemyZone === true) {
+  while(foundTheActions === false) {
+
+    if(possibleActions[actionIndex].progress === maxProgress) {
+
+      if(possibleActions[actionIndex].landsInEnemyZone === false) {
+
+        candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
+      }
+    }
+    else {
+
+      // Termination condition
+      if(candidatesOfMaxProgress.length > 0) {
+        foundTheActions = true;
+      }
+      else {
+        
+        // No valid candidates at this progress level (all landed in enemy zones)
+        // Continue with new (lower) progress level
+        maxProgress = possibleActions[actionIndex].progress;
+
+        if(possibleActions[actionIndex].landsInEnemyZone === false) {
+
+          candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
+        }
+      }
+    }
     actionIndex--;
   }
 
-  action = actions[actionIndex];
+  // Choose randomly from moves of equal progress
+  action = candidatesOfMaxProgress[Math.floor(Math.random() * candidatesOfMaxProgress.length)];
 
   executeAction(action.startRow, action.startCol, action.endRow, action.endCol);
 
@@ -269,17 +301,17 @@ function moveAI() {
  * - Hoare partition scheme chosen because it performs well with repeated values
  * - Actions are sorted according to progress
  * - Moves have progress values of -1, 0 and 1
- * - Jumps have even-numbered progress values (-4, -2, 0, 2, 4, ...)
+ * - Jumps have even-numbered progress values from -16 to 16 
 */
-function sortByDistanceGainedViaQuicksort(actionsArray, startIndex, endIndex) {
+function sortByProgressQuicksort(actionsArray, startIndex, endIndex) {
 
   let pivotIndex;
   
   if(startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
 
     pivotIndex = partition(actionsArray, startIndex, endIndex);
-    sortByDistanceGainedViaQuicksort(actionsArray, startIndex, pivotIndex);
-    sortByDistanceGainedViaQuicksort(actionsArray, pivotIndex + 1, endIndex);
+    sortByProgressQuicksort(actionsArray, startIndex, pivotIndex);
+    sortByProgressQuicksort(actionsArray, pivotIndex + 1, endIndex);
   }
 }
 
