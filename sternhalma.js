@@ -643,7 +643,6 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
 
   let possibleActions = [...getPossibleMoves(startRow, startCol),
                          ...getPossibleJumps([{row: startRow, col: startCol}], startRow, startCol)];
-  let playerNum;
 
   for(let ctr = 0; ctr < possibleActions.length; ctr++) {
 
