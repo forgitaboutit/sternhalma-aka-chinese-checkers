@@ -58,8 +58,7 @@
   </div>
 
   <div class='clear'>
-    <pre><code class='language-javascript'>
-/**
+    <pre><code class='language-javascript'>/**
  * Sternhalma
  * @author Stepan Fyodorovic
  * @description Sternhalma aka Chinese Checkers (1 human vs 5 AI)
@@ -121,7 +120,7 @@ function initializeGameStructure() {
           // Player num is across from end zone num
           cell.playerNum = (endZoneNum + 2) % 6 + 1;
 
-          piece = { row: row, col: col }
+          piece = { row: row, col: col };
           pieces[cell.playerNum][pieces[cell.playerNum].length] = piece;
         }
       }
@@ -423,9 +422,6 @@ function advanceTurn() {
 
 function winnerIs() {
 
-  let pieces = game.pieces[game.whoseTurn];
-  let endZoneNum;
-
   if(game.progress[game.whoseTurn] !== 120) {
     return null;
   }
@@ -539,7 +535,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
   let possibleJumps = [], jump, existingJump, jumpAlreadyThere, landsInEnemyZone;
   let endZoneNum, playerNum;
 
-  for(let outerCtr = 0; outerCtr &lt; startingPoints.length; outerCtr++) {
+  for(outerCtr = 0; outerCtr &lt; startingPoints.length; outerCtr++) {
 
     startRow = startingPoints[outerCtr].row;
     startCol = startingPoints[outerCtr].col;
@@ -710,11 +706,7 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
     if(possibleActions[ctr].endRow === endRow &amp;&amp;
        possibleActions[ctr].endCol === endCol) {
 
-      if(possibleActions[ctr].landsInEnemyZone === true) {
-        return false;
-      }
-
-      return true;
+        return possibleActions[ctr].landsInEnemyZone !== true;
     }
   }
   return false;
