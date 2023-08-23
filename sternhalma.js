@@ -123,6 +123,8 @@ function displayBoards() {
     divRow.css('width', (validCellsThisRow * widthPerCell) + 'px');
     normalBoard.append(divRow);
   }
+
+  $('#boards-ctr').animate({opacity: 1}, 1000);
 }
 
 let processAction = function() {

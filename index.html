@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>sternhalma</title>
-  <link rel='stylesheet' href='/sternhalma-aka-chinese-checkers/sternhalma.css'>
-  <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js"
-          integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE="
+  <link rel='stylesheet' href='/sternhalma-aka-chinese-checkers/sternhalma.css?202308230233'>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+          integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
           crossorigin="anonymous"></script>
-  <script src='/sternhalma-aka-chinese-checkers/sternhalma.js'></script>
+  <script src='/sternhalma-aka-chinese-checkers/sternhalma.js?202308230233'></script>
   <!--The following are for highlighting the JavaScript code displayed on the page-->
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'></script>
@@ -58,7 +58,8 @@
   </div>
 
   <div class='clear'>
-    <pre><code class='language-javascript'>/**
+    <pre><code class='language-javascript'>
+    /**
  * Sternhalma
  * @author Stepan Fyodorovic
  * @description Sternhalma aka Chinese Checkers (1 human vs 5 AI)
@@ -183,6 +184,8 @@ function displayBoards() {
     divRow.css('width', (validCellsThisRow * widthPerCell) + 'px');
     normalBoard.append(divRow);
   }
+
+  $(&#x27;#boards-ctr&#x27;).animate({opacity: 1}, 1000);
 }
 
 let processAction = function() {
