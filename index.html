@@ -210,12 +210,13 @@ let processAction = function() {
       }
 
       executeAction(startRow, startCol, endRow, endCol);
+      advanceTurn();
 
       let interval_ID = setInterval(function() {
 
         game.possibleJumps = [];
 
-        if(advanceTurn() !== game.human &amp;&amp; game.winner === null) {
+        if(game.whoseTurn !== game.human &amp;&amp; game.winner === null) {
           moveAI();
         }
         else {
