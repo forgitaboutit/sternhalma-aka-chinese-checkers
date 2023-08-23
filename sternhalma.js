@@ -150,13 +150,15 @@ let processAction = function() {
       }
 
       executeAction(startRow, startCol, endRow, endCol);
-      
+      advanceTurn();
+
       let interval_ID = setInterval(function() {
 
         game.possibleJumps = [];
 
-        if(advanceTurn() !== game.human && game.winner === null) {
+        if(game.whoseTurn !== game.human && game.winner === null) {
           moveAI();
+          advanceTurn();
         }
         else {
           clearInterval(interval_ID);
