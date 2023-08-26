@@ -8,7 +8,6 @@
 let game; // state of game
 
 $(function() {
-
   initializeGameStructure();
   displayBoards();
 });
@@ -19,7 +18,7 @@ function initializeGameStructure() {
 
   // Track locations of pieces by player for fast lookup
   let pieces = { 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-  
+
   // Track progress of each player
   let progress = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0 };
 
@@ -46,7 +45,7 @@ function initializeGameStructure() {
         playerNum: null,
         endZoneNum: null
       };
-      
+
       cell.inBounds = inBounds(row, col);
 
       if(cell.inBounds) {
@@ -82,19 +81,19 @@ function displayBoards() {
   const widthPerCell = 55; // 50px + (2 * 2.5px)
 
   for(row = 0; row < 17; row++) {
-  
+
     validCellsThisRow = 0;
 
     tr = $('<tr id="array-board-row-' + row + '"></tr>');
     divRow = $('<div class="row row-' + row + '"></div>');
 
     for(col = 0; col < board[row].length; col++) {
-      
+
       cell = board[row][col];
-      
+
       td = $('<td id="array-board-' + row + 'x' + col + '">' + row + ',' + col + '</td>');
       divCell = $('<div id="normal-board-' + row + 'x' + col + '" class="normal-board-cell"></div>');
-      
+
       if(cell.inBounds === false) {
 
         td.addClass('out-of-bounds');
@@ -135,7 +134,7 @@ let processAction = function() {
   if(game.selectedPiece !== null && $(this).hasClass('player') === false) {
 
     let startRow, startCol, endRow, endCol;
-    
+
     let selectedPiece = game.selectedPiece.split('x');
     startRow = parseInt(selectedPiece[0]);
     startCol = parseInt(selectedPiece[1]);
@@ -152,7 +151,7 @@ let processAction = function() {
       }
 
       executeAction(startRow, startCol, endRow, endCol);
-      advanceTurn();
+      advanceTurn(); // execute immediately (setInterval's 1st iteration is delayed)
 
       let interval_ID = setInterval(function() {
 
@@ -164,6 +163,11 @@ let processAction = function() {
         }
         else {
           clearInterval(interval_ID);
+
+          if(game.winner !== null) {
+            activateBlastSeries();
+            return;
+          }
         }
       }, 1000);
     }
@@ -277,7 +281,7 @@ function moveAI() {
         foundTheActions = true;
       }
       else {
-        
+
         // No valid candidates at this progress level (all landed in enemy zones)
         // Continue with new (lower) progress level
         maxProgress = possibleActions[actionIndex].progress;
@@ -305,12 +309,12 @@ function moveAI() {
  * - Hoare partition scheme chosen because it performs well with repeated values
  * - Actions are sorted according to progress
  * - Moves have progress values of -1, 0 and 1
- * - Jumps have even-numbered progress values from -16 to 16 
+ * - Jumps have even-numbered progress values from -16 to 16
 */
 function sortByProgressQuicksort(actionsArray, startIndex, endIndex) {
 
   let pivotIndex;
-  
+
   if(startIndex >= 0 && endIndex >= 0 && startIndex < endIndex) {
 
     pivotIndex = partition(actionsArray, startIndex, endIndex);
@@ -341,7 +345,7 @@ function partition(actionsArray, startIndex, endIndex) {
 }
 
 function calculateProgress(startRow, startCol, endRow, endCol) {
-  
+
   switch(game.whoseTurn) {
 
     case 1: return (endRow - startRow);
@@ -383,7 +387,7 @@ function getPossibleMoves(startRow, startCol) {
 
   // 1. Check above cell
   if(startRow > 0) {
-    
+
     cell = game.board[startRow - 1][startCol];
 
     if(cell.playerNum === null && cell.inBounds === true) {
@@ -486,7 +490,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
     // 1. Check 2 cells above
     if(startRow > 1) {
-      
+
       adjacentCell = game.board[startRow - 1][startCol];
 
       if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
@@ -621,7 +625,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
         game.possibleJumps[game.possibleJumps.length] = jump;
 
         // Add to return array
-        possibleJumps[possibleJumps.length] = jump; 
+        possibleJumps[possibleJumps.length] = jump;
 
         newStartingPoints[newStartingPoints.length] = {
           row: landingCell.row,
@@ -694,4 +698,32 @@ function endZone(row, col) {
     }
   }
   return null;
+}
+
+function blastConfetti() {
+
+  confetti({
+    particleCount: 150,
+    spread: 100,
+    origin: { y: 0.7 },
+    colors: $('#progress-tracker th.player-' + game.winner).css('background-color')
+  });
+}
+
+function activateBlastSeries() {
+
+  let numBlasts = 5, blastCtr = 0;
+
+  blastConfetti(); // immediate blast (setInterval's 1st iteration is delayed)
+  blastCtr++;
+
+  let interval_ID = setInterval(function() {
+
+    if(blastCtr++ < numBlasts) {
+      blastConfetti();
+    }
+    else {
+      clearInterval(interval_ID);
+    }
+  }, 1000);
 }
