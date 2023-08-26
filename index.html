@@ -6,11 +6,12 @@
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"
           integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
           crossorigin="anonymous"></script>
-  <script src='/sternhalma-aka-chinese-checkers/sternhalma.js?202308230233'></script>
+  <script src='/Desktop/sternhalma-aka-chinese-checkers/sternhalma.js?202308230233'></script>
   <!--The following are for highlighting the JavaScript code displayed on the page-->
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css'>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
   <script>hljs.highlightAll();</script>
 </head>
 
@@ -68,7 +69,6 @@
 let game; // state of game
 
 $(function() {
-
   initializeGameStructure();
   displayBoards();
 });
@@ -184,7 +184,7 @@ function displayBoards() {
     normalBoard.append(divRow);
   }
 
-  $(&#x27;#boards-ctr&#x27;).animate({opacity: 1}, 1000);
+  $('#boards-ctr').animate({opacity: 1}, 1000);
 }
 
 let processAction = function() {
@@ -200,7 +200,7 @@ let processAction = function() {
     startRow = parseInt(selectedPiece[0]);
     startCol = parseInt(selectedPiece[1]);
 
-    let targetSpace = $(this).prop('id').match(/\d+x\d+$/)[0].split('x');
+    let targetSpace = $(this).prop('id').match(/d+xd+$/)[0].split('x');
     endRow = parseInt(targetSpace[0]);
     endCol = parseInt(targetSpace[1]);
 
@@ -212,7 +212,7 @@ let processAction = function() {
       }
 
       executeAction(startRow, startCol, endRow, endCol);
-      advanceTurn();
+      advanceTurn(); // execute immediately (setInterval's 1st iteration is delayed)
 
       let interval_ID = setInterval(function() {
 
@@ -220,9 +220,15 @@ let processAction = function() {
 
         if(game.whoseTurn !== game.human &amp;&amp; game.winner === null) {
           moveAI();
+          advanceTurn();
         }
         else {
           clearInterval(interval_ID);
+
+          if(game.winner !== null) {
+            activateBlastSeries();
+            return;
+          }
         }
       }, 1000);
     }
@@ -252,7 +258,7 @@ let processAction = function() {
         $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
       }
 
-      game.selectedPiece = $(this).prop('id').match(/\d+x\d+$/)[0];
+      game.selectedPiece = $(this).prop('id').match(/d+xd+$/)[0];
       $('#array-board-' + game.selectedPiece).addClass('selected-piece');
       $('#normal-board-' + game.selectedPiece).addClass('selected-piece');
     }
@@ -754,7 +760,34 @@ function endZone(row, col) {
   }
   return null;
 }
-    </code></pre>
+
+function blastConfetti() {
+
+  confetti({
+    particleCount: 150,
+    spread: 100,
+    origin: { y: 0.7 },
+    colors: $('#progress-tracker th.player-' + game.winner).css('background-color')
+  });
+}
+
+function activateBlastSeries() {
+
+  let numBlasts = 5, blastCtr = 0;
+
+  blastConfetti(); // immediate blast (setInterval's 1st iteration is delayed)
+  blastCtr++;
+
+  let interval_ID = setInterval(function() {
+
+    if(blastCtr++ &lt; numBlasts) {
+      blastConfetti();
+    }
+    else {
+      clearInterval(interval_ID);
+    }
+  }, 1000);
+}</code></pre>
   </div>
 
 </body>
