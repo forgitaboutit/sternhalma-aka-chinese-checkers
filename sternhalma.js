@@ -52,7 +52,7 @@ function initializeGameStructure() {
 
         endZoneNum = endZone(row, col);
 
-        if(endZoneNum !== null) {
+        if(endZoneNum != null) {
 
           cell.endZoneNum = endZoneNum;
 
@@ -94,7 +94,7 @@ function displayBoards() {
       td = $('<td id="array-board-' + row + 'x' + col + '">' + row + ',' + col + '</td>');
       divCell = $('<div id="normal-board-' + row + 'x' + col + '" class="normal-board-cell"></div>');
 
-      if(cell.inBounds === false) {
+      if(cell.inBounds == false) {
 
         td.addClass('out-of-bounds');
         divCell.addClass('out-of-bounds');
@@ -128,10 +128,10 @@ function displayBoards() {
 
 let processAction = function() {
 
-  if(game.winner !== null) return;
+  if(game.winner != null) return;
 
   // Selecting a destination for the selected piece
-  if(game.selectedPiece !== null && $(this).hasClass('player') === false) {
+  if(game.selectedPiece != null && $(this).hasClass('player') == false) {
 
     let startRow, startCol, endRow, endCol;
 
@@ -145,29 +145,44 @@ let processAction = function() {
 
     if(destinationIsValid(startRow, startCol, endRow, endCol)) {
 
-      if(game.whoseTurn === null) { // opening move
+      if(game.whoseTurn == null) { // opening move
         game.whoseTurn = game.board[startRow][startCol].playerNum;
         game.human = game.board[startRow][startCol].playerNum;
       }
 
       executeAction(startRow, startCol, endRow, endCol);
-      advanceTurn(); // execute immediately (setInterval's 1st iteration is delayed)
+
+      // Check for winner immediately (setInterval's 1st iteration is delayed)
+      if(winnerIs() == null) {
+        advanceTurn();
+      }
+      else {
+        game.winner = game.whoseTurn;
+        game.whoseTurn = null;
+        activateBlastSeries();
+        return;
+      }
 
       let interval_ID = setInterval(function() {
 
         game.possibleJumps = [];
 
-        if(game.whoseTurn !== game.human && game.winner === null) {
+        if(game.whoseTurn != game.human && game.winner == null) {
+
           moveAI();
-          advanceTurn();
+
+          if(winnerIs() == null) {
+            advanceTurn();
+          }
+          else {
+            clearInterval(interval_ID);
+            game.winner = game.whoseTurn;
+            game.whoseTurn = null;
+            activateBlastSeries();
+          }
         }
         else {
           clearInterval(interval_ID);
-
-          if(game.winner !== null) {
-            activateBlastSeries();
-            return;
-          }
         }
       }, 1000);
     }
@@ -188,11 +203,11 @@ let processAction = function() {
   // Selection
   if($(this).hasClass('player')) {
 
-    if((game.whoseTurn === game.human && $(this).hasClass('player-' + game.human)) ||
-        game.whoseTurn === null)
+    if((game.whoseTurn == game.human && $(this).hasClass('player-' + game.human)) ||
+        game.whoseTurn == null)
     {
 
-      if(game.selectedPiece !== null) { // Reselection
+      if(game.selectedPiece != null) { // Reselection
         $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
         $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
       }
@@ -265,11 +280,11 @@ function moveAI() {
   // Iterate backwards until eligible move(s) of max progress have been found
   foundTheActions = false;
 
-  while(foundTheActions === false) {
+  while(foundTheActions == false) {
 
-    if(possibleActions[actionIndex].progress === maxProgress) {
+    if(possibleActions[actionIndex].progress == maxProgress) {
 
-      if(possibleActions[actionIndex].landsInEnemyZone === false) {
+      if(possibleActions[actionIndex].landsInEnemyZone == false) {
 
         candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
       }
@@ -286,7 +301,7 @@ function moveAI() {
         // Continue with new (lower) progress level
         maxProgress = possibleActions[actionIndex].progress;
 
-        if(possibleActions[actionIndex].landsInEnemyZone === false) {
+        if(possibleActions[actionIndex].landsInEnemyZone == false) {
 
           candidatesOfMaxProgress[candidatesOfMaxProgress.length] = possibleActions[actionIndex];
         }
@@ -361,7 +376,7 @@ function advanceTurn() {
 
   game.numTurns++;
 
-  if(winnerIs() === null) {
+  if(winnerIs() == null) {
     return game.whoseTurn = game.whoseTurn % 6 + 1; // clockwise
   }
   game.winner = game.whoseTurn;
@@ -370,7 +385,7 @@ function advanceTurn() {
 
 function winnerIs() {
 
-  if(game.progress[game.whoseTurn] !== 120) {
+  if(game.progress[game.whoseTurn] != 120) {
     return null;
   }
 
@@ -390,7 +405,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow - 1][startCol];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -400,7 +415,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow][startCol + 1];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -410,7 +425,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow + 1][startCol + 1];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -420,7 +435,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow + 1][startCol];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -430,7 +445,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow][startCol - 1];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -440,7 +455,7 @@ function getPossibleMoves(startRow, startCol) {
 
     cell = game.board[startRow - 1][startCol - 1];
 
-    if(cell.playerNum === null && cell.inBounds === true) {
+    if(cell.playerNum == null && cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
@@ -451,7 +466,7 @@ function getPossibleMoves(startRow, startCol) {
     playerNum = game.whoseTurn;
     landsInEnemyZone = false;
 
-    if(endZoneNum !== null && playerNum !== endZoneNum && playerNum !== (endZoneNum + 2) % 6 + 1) {
+    if(endZoneNum != null && playerNum != endZoneNum && playerNum != (endZoneNum + 2) % 6 + 1) {
       landsInEnemyZone = true;
     }
 
@@ -471,8 +486,8 @@ function getPossibleMoves(startRow, startCol) {
 function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
   // Reset master list for ignoring duplicate jumps
-  if(startingPoints[0].row === originalStartRow &&
-     startingPoints[0].col === originalStartCol) {
+  if(startingPoints[0].row == originalStartRow &&
+     startingPoints[0].col == originalStartCol) {
 
     game.possibleJumps = [];
   }
@@ -493,11 +508,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow - 1][startCol];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow - 2][startCol];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -509,11 +524,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow][startCol + 1];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow][startCol + 2];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -525,11 +540,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow + 1][startCol + 1];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow + 2][startCol + 2];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -541,11 +556,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow + 1][startCol];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow + 2][startCol];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -557,11 +572,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow][startCol - 1];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow][startCol - 2];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -573,11 +588,11 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
       adjacentCell = game.board[startRow - 1][startCol - 1];
 
-      if(adjacentCell.inBounds && adjacentCell.playerNum !== null) {
+      if(adjacentCell.inBounds && adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow - 2][startCol - 2];
 
-        if(landingCell.inBounds && landingCell.playerNum === null) {
+        if(landingCell.inBounds && landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -596,19 +611,19 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
         existingJump = game.possibleJumps[jumpCtr];
 
-        if(existingJump.startRow === originalStartRow && existingJump.endRow === landingCell.row &&
-           existingJump.startCol === originalStartCol && existingJump.endCol === landingCell.col) {
+        if(existingJump.startRow == originalStartRow && existingJump.endRow == landingCell.row &&
+           existingJump.startCol == originalStartCol && existingJump.endCol == landingCell.col) {
 
           jumpAlreadyThere = true;
         }
       }
 
-      if(jumpAlreadyThere === false) {
+      if(jumpAlreadyThere == false) {
 
         endZoneNum = endZone(landingCell.row, landingCell.col);
         playerNum = game.board[originalStartRow][originalStartCol].playerNum;
 
-        if(endZoneNum !== null && playerNum !== endZoneNum && playerNum !== (endZoneNum + 2) % 6 + 1) {
+        if(endZoneNum != null && playerNum != endZoneNum && playerNum != (endZoneNum + 2) % 6 + 1) {
           landsInEnemyZone = true;
         }
 
@@ -636,7 +651,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
   }
 
   // Termination condition
-  if(newStartingPoints.length === 0) {
+  if(newStartingPoints.length == 0) {
     return [];
   }
 
@@ -651,10 +666,10 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
 
   for(let ctr = 0; ctr < possibleActions.length; ctr++) {
 
-    if(possibleActions[ctr].endRow === endRow &&
-       possibleActions[ctr].endCol === endCol) {
+    if(possibleActions[ctr].endRow == endRow &&
+       possibleActions[ctr].endCol == endCol) {
 
-        return possibleActions[ctr].landsInEnemyZone !== true;
+        return possibleActions[ctr].landsInEnemyZone != true;
     }
   }
   return false;
