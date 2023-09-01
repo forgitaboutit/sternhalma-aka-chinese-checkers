@@ -94,11 +94,11 @@ function initializeGameStructure() {
     progress: progress
   };
 
-  for(let row = 0; row &lt;= 16; row++) {
+  for(let row = 0; row &#x3C;= 16; row++) {
 
     board[row] = [];
 
-    for(let col = 0; col &lt;= 16; col++) {
+    for(let col = 0; col &#x3C;= 16; col++) {
 
       cell = {
         row: row,
@@ -136,55 +136,55 @@ function initializeGameStructure() {
 function displayBoards() {
 
   let board = game.board, cell, row, col;
-  let arrayBoard = $('#array-board'), tr, td;
-  let normalBoard = $('#normal-board'), divRow, divCell;
+  let arrayBoard = $(&#x27;#array-board&#x27;), tr, td;
+  let normalBoard = $(&#x27;#normal-board&#x27;), divRow, divCell;
   let validCellsThisRow;
   const widthPerCell = 55; // 50px + (2 * 2.5px)
 
-  for(row = 0; row &lt; 17; row++) {
+  for(row = 0; row &#x3C; 17; row++) {
 
     validCellsThisRow = 0;
 
-    tr = $('&lt;tr id=&quot;array-board-row-' + row + '&quot;&gt;&lt;/tr&gt;');
-    divRow = $('&lt;div class=&quot;row row-' + row + '&quot;&gt;&lt;/div&gt;');
+    tr = $(&#x27;&#x3C;tr id=&#x22;array-board-row-&#x27; + row + &#x27;&#x22;&#x3E;&#x3C;/tr&#x3E;&#x27;);
+    divRow = $(&#x27;&#x3C;div class=&#x22;row row-&#x27; + row + &#x27;&#x22;&#x3E;&#x3C;/div&#x3E;&#x27;);
 
-    for(col = 0; col &lt; board[row].length; col++) {
+    for(col = 0; col &#x3C; board[row].length; col++) {
 
       cell = board[row][col];
 
-      td = $('&lt;td id=&quot;array-board-' + row + 'x' + col + '&quot;&gt;' + row + ',' + col + '&lt;/td&gt;');
-      divCell = $('&lt;div id=&quot;normal-board-' + row + 'x' + col + '&quot; class=&quot;normal-board-cell&quot;&gt;&lt;/div&gt;');
+      td = $(&#x27;&#x3C;td id=&#x22;array-board-&#x27; + row + &#x27;x&#x27; + col + &#x27;&#x22;&#x3E;&#x27; + row + &#x27;,&#x27; + col + &#x27;&#x3C;/td&#x3E;&#x27;);
+      divCell = $(&#x27;&#x3C;div id=&#x22;normal-board-&#x27; + row + &#x27;x&#x27; + col + &#x27;&#x22; class=&#x22;normal-board-cell&#x22;&#x3E;&#x3C;/div&#x3E;&#x27;);
 
       if(cell.inBounds == false) {
 
-        td.addClass('out-of-bounds');
-        divCell.addClass('out-of-bounds');
+        td.addClass(&#x27;out-of-bounds&#x27;);
+        divCell.addClass(&#x27;out-of-bounds&#x27;);
       }
       else {
 
         validCellsThisRow++;
 
-        td.css('cursor', 'pointer');
-        divCell.css('cursor', 'pointer');
+        td.css(&#x27;cursor&#x27;, &#x27;pointer&#x27;);
+        divCell.css(&#x27;cursor&#x27;, &#x27;pointer&#x27;);
 
-        td.bind('click', processAction);
-        divCell.bind('click', processAction);
+        td.bind(&#x27;click&#x27;, processAction);
+        divCell.bind(&#x27;click&#x27;, processAction);
 
-        if(cell.playerNum &gt; 0) {
+        if(cell.playerNum &#x3E; 0) {
 
-          td.addClass('player player-' + cell.playerNum);
-          divCell.addClass('player player-' + cell.playerNum);
+          td.addClass(&#x27;player player-&#x27; + cell.playerNum);
+          divCell.addClass(&#x27;player player-&#x27; + cell.playerNum);
         }
       }
       tr.append(td);
       divRow.append(divCell);
     }
     arrayBoard.append(tr);
-    divRow.css('width', (validCellsThisRow * widthPerCell) + 'px');
+    divRow.css(&#x27;width&#x27;, (validCellsThisRow * widthPerCell) + &#x27;px&#x27;);
     normalBoard.append(divRow);
   }
 
-  $('#boards-ctr').animate({opacity: 1}, 1000);
+  $(&#x27;#boards-ctr&#x27;).animate({opacity: 1}, 1000);
 }
 
 let processAction = function() {
@@ -192,15 +192,15 @@ let processAction = function() {
   if(game.winner != null) return;
 
   // Selecting a destination for the selected piece
-  if(game.selectedPiece != null &amp;&amp; $(this).hasClass('player') == false) {
+  if(game.selectedPiece != null &#x26;&#x26; $(this).hasClass(&#x27;player&#x27;) == false) {
 
     let startRow, startCol, endRow, endCol;
 
-    let selectedPiece = game.selectedPiece.split('x');
+    let selectedPiece = game.selectedPiece.split(&#x27;x&#x27;);
     startRow = parseInt(selectedPiece[0]);
     startCol = parseInt(selectedPiece[1]);
 
-    let targetSpace = $(this).prop('id').match(/d+xd+$/)[0].split('x');
+    let targetSpace = $(this).prop(&#x27;id&#x27;).match(/\d+x\d+$/)[0].split(&#x27;x&#x27;);
     endRow = parseInt(targetSpace[0]);
     endCol = parseInt(targetSpace[1]);
 
@@ -213,7 +213,7 @@ let processAction = function() {
 
       executeAction(startRow, startCol, endRow, endCol);
 
-      // Check for winner immediately (setInterval's 1st iteration is delayed)
+      // Check for winner immediately (setInterval&#x27;s 1st iteration is delayed)
       if(winnerIs() == null) {
         advanceTurn();
       }
@@ -228,7 +228,7 @@ let processAction = function() {
 
         game.possibleJumps = [];
 
-        if(game.whoseTurn != game.human &amp;&amp; game.winner == null) {
+        if(game.whoseTurn != game.human &#x26;&#x26; game.winner == null) {
 
           moveAI();
 
@@ -251,10 +251,10 @@ let processAction = function() {
   }
 
   // Deselection
-  if($(this).hasClass('selected-piece')) {
+  if($(this).hasClass(&#x27;selected-piece&#x27;)) {
 
-    $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
-    $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+    $(&#x27;#array-board-&#x27; + game.selectedPiece).removeClass(&#x27;selected-piece&#x27;);
+    $(&#x27;#normal-board-&#x27; + game.selectedPiece).removeClass(&#x27;selected-piece&#x27;);
 
     game.selectedPiece = null;
 
@@ -262,20 +262,20 @@ let processAction = function() {
   }
 
   // Selection
-  if($(this).hasClass('player')) {
+  if($(this).hasClass(&#x27;player&#x27;)) {
 
-    if((game.whoseTurn == game.human &amp;&amp; $(this).hasClass('player-' + game.human)) ||
+    if((game.whoseTurn == game.human &#x26;&#x26; $(this).hasClass(&#x27;player-&#x27; + game.human)) ||
         game.whoseTurn == null)
     {
 
       if(game.selectedPiece != null) { // Reselection
-        $('#array-board-' + game.selectedPiece).removeClass('selected-piece');
-        $('#normal-board-' + game.selectedPiece).removeClass('selected-piece');
+        $(&#x27;#array-board-&#x27; + game.selectedPiece).removeClass(&#x27;selected-piece&#x27;);
+        $(&#x27;#normal-board-&#x27; + game.selectedPiece).removeClass(&#x27;selected-piece&#x27;);
       }
 
-      game.selectedPiece = $(this).prop('id').match(/d+xd+$/)[0];
-      $('#array-board-' + game.selectedPiece).addClass('selected-piece');
-      $('#normal-board-' + game.selectedPiece).addClass('selected-piece');
+      game.selectedPiece = $(this).prop(&#x27;id&#x27;).match(/\d+x\d+$/)[0];
+      $(&#x27;#array-board-&#x27; + game.selectedPiece).addClass(&#x27;selected-piece&#x27;);
+      $(&#x27;#normal-board-&#x27; + game.selectedPiece).addClass(&#x27;selected-piece&#x27;);
     }
 
     return;
@@ -294,20 +294,20 @@ function executeAction(startRow, startCol, endRow, endCol) {
   game.selectedPiece = null;
 
   // Move pieces
-  $('#array-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
-  $('#normal-board-' + startRow + 'x' + startCol).removeClass('selected-piece player player-' + playerNum);
+  $(&#x27;#array-board-&#x27; + startRow + &#x27;x&#x27; + startCol).removeClass(&#x27;selected-piece player player-&#x27; + playerNum);
+  $(&#x27;#normal-board-&#x27; + startRow + &#x27;x&#x27; + startCol).removeClass(&#x27;selected-piece player player-&#x27; + playerNum);
 
-  $('#array-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
-  $('#normal-board-' + endRow + 'x' + endCol).addClass('player player-' + playerNum);
+  $(&#x27;#array-board-&#x27; + endRow + &#x27;x&#x27; + endCol).addClass(&#x27;player player-&#x27; + playerNum);
+  $(&#x27;#normal-board-&#x27; + endRow + &#x27;x&#x27; + endCol).addClass(&#x27;player player-&#x27; + playerNum);
 
-  // Update player's progress
+  // Update player&#x27;s progress
   game.progress[playerNum] += calculateProgress(startRow, startCol, endRow, endCol);
-  $('#progress-player-' + playerNum).html(game.progress[playerNum]);
+  $(&#x27;#progress-player-&#x27; + playerNum).html(game.progress[playerNum]);
 
   // Update pieces structure.
-  for(let ctr = 0; ctr &lt; pieces.length; ctr++) {
+  for(let ctr = 0; ctr &#x3C; pieces.length; ctr++) {
 
-    if(pieces[ctr].row == startRow &amp;&amp; pieces[ctr].col == startCol) {
+    if(pieces[ctr].row == startRow &#x26;&#x26; pieces[ctr].col == startCol) {
 
       pieces[ctr].row = endRow;
       pieces[ctr].col = endCol;
@@ -324,7 +324,7 @@ function moveAI() {
   let candidatesOfMaxProgress = [], maxProgress, foundTheActions;
 
   // Get possible actions for all 10 pieces into an array
-  for(let ctr = 0; ctr &lt; pieces.length; ctr++) {
+  for(let ctr = 0; ctr &#x3C; pieces.length; ctr++) {
 
     possibleMovesOnePiece = getPossibleMoves(pieces[ctr].row, pieces[ctr].col);
     possibleJumpsOnePiece = getPossibleJumps([{row: pieces[ctr].row, col: pieces[ctr].col}], pieces[ctr].row, pieces[ctr].col);
@@ -353,7 +353,7 @@ function moveAI() {
     else {
 
       // Termination condition
-      if(candidatesOfMaxProgress.length &gt; 0) {
+      if(candidatesOfMaxProgress.length &#x3E; 0) {
         foundTheActions = true;
       }
       else {
@@ -391,7 +391,7 @@ function sortByProgressQuicksort(actionsArray, startIndex, endIndex) {
 
   let pivotIndex;
 
-  if(startIndex &gt;= 0 &amp;&amp; endIndex &gt;= 0 &amp;&amp; startIndex &lt; endIndex) {
+  if(startIndex &#x3E;= 0 &#x26;&#x26; endIndex &#x3E;= 0 &#x26;&#x26; startIndex &#x3C; endIndex) {
 
     pivotIndex = partition(actionsArray, startIndex, endIndex);
     sortByProgressQuicksort(actionsArray, startIndex, pivotIndex);
@@ -408,10 +408,10 @@ function partition(actionsArray, startIndex, endIndex) {
 
   while(true) {
 
-    do { leftIndex++; } while(actionsArray[leftIndex].progress &lt; pivotValue);
-    do { rightIndex--; } while(actionsArray[rightIndex].progress &gt; pivotValue);
+    do { leftIndex++; } while(actionsArray[leftIndex].progress &#x3C; pivotValue);
+    do { rightIndex--; } while(actionsArray[rightIndex].progress &#x3E; pivotValue);
 
-    if(leftIndex &gt;= rightIndex) return rightIndex;
+    if(leftIndex &#x3E;= rightIndex) return rightIndex;
 
     // Swap actionsArray[leftIndex] with actionsArray[rightIndex]
     actionHolder = actionsArray[leftIndex];
@@ -450,7 +450,7 @@ function winnerIs() {
     return null;
   }
 
-  $('td#progress-player-' + game.whoseTurn).css('background', '#39ff14');
+  $(&#x27;td#progress-player-&#x27; + game.whoseTurn).css(&#x27;background&#x27;, &#x27;#39ff14&#x27;);
 
   return game.whoseTurn;
 }
@@ -462,72 +462,72 @@ function getPossibleMoves(startRow, startCol) {
   let endZoneNum, playerNum, landsInEnemyZone;
 
   // 1. Check above cell
-  if(startRow &gt; 0) {
+  if(startRow &#x3E; 0) {
 
     cell = game.board[startRow - 1][startCol];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
   // 2. Check right cell
-  if(startCol &lt; 16) {
+  if(startCol &#x3C; 16) {
 
     cell = game.board[startRow][startCol + 1];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
   // 3. Check lower-right cell
-  if(startRow &lt; 16 &amp;&amp; startCol &lt; 16) {
+  if(startRow &#x3C; 16 &#x26;&#x26; startCol &#x3C; 16) {
 
     cell = game.board[startRow + 1][startCol + 1];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
   // 4. Check below cell
-  if(startRow &lt; 16) {
+  if(startRow &#x3C; 16) {
 
     cell = game.board[startRow + 1][startCol];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
   // 5. Check left cell
-  if(startCol &gt; 0) {
+  if(startCol &#x3E; 0) {
 
     cell = game.board[startRow][startCol - 1];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
   // 6. Check upper-left cell
-  if(startCol &gt; 0 &amp;&amp; startRow &gt; 0) {
+  if(startCol &#x3E; 0 &#x26;&#x26; startRow &#x3E; 0) {
 
     cell = game.board[startRow - 1][startCol - 1];
 
-    if(cell.playerNum == null &amp;&amp; cell.inBounds == true) {
+    if(cell.playerNum == null &#x26;&#x26; cell.inBounds == true) {
       cells[cells.length] = cell;
     }
   }
 
-  for(let ctr = 0; ctr &lt; cells.length; ctr++) {
+  for(let ctr = 0; ctr &#x3C; cells.length; ctr++) {
 
     endZoneNum = endZone(cells[ctr].row, cells[ctr].col);
     playerNum = game.whoseTurn;
     landsInEnemyZone = false;
 
-    if(endZoneNum != null &amp;&amp; playerNum != endZoneNum &amp;&amp; playerNum != (endZoneNum + 2) % 6 + 1) {
+    if(endZoneNum != null &#x26;&#x26; playerNum != endZoneNum &#x26;&#x26; playerNum != (endZoneNum + 2) % 6 + 1) {
       landsInEnemyZone = true;
     }
 
@@ -547,7 +547,7 @@ function getPossibleMoves(startRow, startCol) {
 function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
 
   // Reset master list for ignoring duplicate jumps
-  if(startingPoints[0].row == originalStartRow &amp;&amp;
+  if(startingPoints[0].row == originalStartRow &#x26;&#x26;
      startingPoints[0].col == originalStartCol) {
 
     game.possibleJumps = [];
@@ -559,21 +559,21 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
   let possibleJumps = [], jump, existingJump, jumpAlreadyThere, landsInEnemyZone;
   let endZoneNum, playerNum;
 
-  for(outerCtr = 0; outerCtr &lt; startingPoints.length; outerCtr++) {
+  for(outerCtr = 0; outerCtr &#x3C; startingPoints.length; outerCtr++) {
 
     startRow = startingPoints[outerCtr].row;
     startCol = startingPoints[outerCtr].col;
 
     // 1. Check 2 cells above
-    if(startRow &gt; 1) {
+    if(startRow &#x3E; 1) {
 
       adjacentCell = game.board[startRow - 1][startCol];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow - 2][startCol];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -581,15 +581,15 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
     }
 
     // 2. Check 2 cells to the right
-    if(startCol &lt; 15) {
+    if(startCol &#x3C; 15) {
 
       adjacentCell = game.board[startRow][startCol + 1];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow][startCol + 2];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -597,15 +597,15 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
     }
 
     // 3. Check 2 cells to the lower-right
-    if(startRow &lt; 15 &amp;&amp; startCol &lt; 15) {
+    if(startRow &#x3C; 15 &#x26;&#x26; startCol &#x3C; 15) {
 
       adjacentCell = game.board[startRow + 1][startCol + 1];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow + 2][startCol + 2];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -613,15 +613,15 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
     }
 
     // 4. Check 2 cells below
-    if(startRow &lt; 15) {
+    if(startRow &#x3C; 15) {
 
       adjacentCell = game.board[startRow + 1][startCol];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow + 2][startCol];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -629,15 +629,15 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
     }
 
     // 5. Check 2 cells to the left
-    if(startCol &gt; 1) {
+    if(startCol &#x3E; 1) {
 
       adjacentCell = game.board[startRow][startCol - 1];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow][startCol - 2];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
@@ -645,22 +645,22 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
     }
 
     // 6. Check 2 cells to the upper-left
-    if(startCol &gt; 1 &amp;&amp; startRow &gt; 1) {
+    if(startCol &#x3E; 1 &#x26;&#x26; startRow &#x3E; 1) {
 
       adjacentCell = game.board[startRow - 1][startCol - 1];
 
-      if(adjacentCell.inBounds &amp;&amp; adjacentCell.playerNum != null) {
+      if(adjacentCell.inBounds &#x26;&#x26; adjacentCell.playerNum != null) {
 
         landingCell = game.board[startRow - 2][startCol - 2];
 
-        if(landingCell.inBounds &amp;&amp; landingCell.playerNum == null) {
+        if(landingCell.inBounds &#x26;&#x26; landingCell.playerNum == null) {
 
           landingCells[landingCells.length] = landingCell;
         }
       }
     }
 
-    for(innerCtr = 0; innerCtr &lt; landingCells.length; innerCtr++) {
+    for(innerCtr = 0; innerCtr &#x3C; landingCells.length; innerCtr++) {
 
       landingCell = landingCells[innerCtr];
 
@@ -668,12 +668,12 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
       landsInEnemyZone = false;
 
       // Ignore duplicate destinations
-      for(jumpCtr = 0; jumpCtr &lt; game.possibleJumps.length; jumpCtr++) {
+      for(jumpCtr = 0; jumpCtr &#x3C; game.possibleJumps.length; jumpCtr++) {
 
         existingJump = game.possibleJumps[jumpCtr];
 
-        if(existingJump.startRow == originalStartRow &amp;&amp; existingJump.endRow == landingCell.row &amp;&amp;
-           existingJump.startCol == originalStartCol &amp;&amp; existingJump.endCol == landingCell.col) {
+        if(existingJump.startRow == originalStartRow &#x26;&#x26; existingJump.endRow == landingCell.row &#x26;&#x26;
+           existingJump.startCol == originalStartCol &#x26;&#x26; existingJump.endCol == landingCell.col) {
 
           jumpAlreadyThere = true;
         }
@@ -684,7 +684,7 @@ function getPossibleJumps(startingPoints, originalStartRow, originalStartCol) {
         endZoneNum = endZone(landingCell.row, landingCell.col);
         playerNum = game.board[originalStartRow][originalStartCol].playerNum;
 
-        if(endZoneNum != null &amp;&amp; playerNum != endZoneNum &amp;&amp; playerNum != (endZoneNum + 2) % 6 + 1) {
+        if(endZoneNum != null &#x26;&#x26; playerNum != endZoneNum &#x26;&#x26; playerNum != (endZoneNum + 2) % 6 + 1) {
           landsInEnemyZone = true;
         }
 
@@ -725,9 +725,9 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
   let possibleActions = [...getPossibleMoves(startRow, startCol),
                          ...getPossibleJumps([{row: startRow, col: startCol}], startRow, startCol)];
 
-  for(let ctr = 0; ctr &lt; possibleActions.length; ctr++) {
+  for(let ctr = 0; ctr &#x3C; possibleActions.length; ctr++) {
 
-    if(possibleActions[ctr].endRow == endRow &amp;&amp;
+    if(possibleActions[ctr].endRow == endRow &#x26;&#x26;
        possibleActions[ctr].endCol == endCol) {
 
         return possibleActions[ctr].landsInEnemyZone != true;
@@ -738,19 +738,19 @@ function destinationIsValid(startRow, startCol, endRow, endCol) {
 
 function inBounds(row, col) {
 
-  if(row &lt; 4 &amp;&amp; col &lt; 4) return false; // upper left corner
-  if(row &lt; 4 &amp;&amp; col &gt; 12) return false; // upper right corner
-  if(row &gt; 12 &amp;&amp; col &gt; 12) return false; // lower right corner
-  if(row &gt; 12 &amp;&amp; col &lt; 4) return false; // lower left corner
+  if(row &#x3C; 4 &#x26;&#x26; col &#x3C; 4) return false; // upper left corner
+  if(row &#x3C; 4 &#x26;&#x26; col &#x3E; 12) return false; // upper right corner
+  if(row &#x3E; 12 &#x26;&#x26; col &#x3E; 12) return false; // lower right corner
+  if(row &#x3E; 12 &#x26;&#x26; col &#x3C; 4) return false; // lower left corner
 
-  for(let outerCtr = 0; outerCtr &lt; 4; outerCtr++) {
+  for(let outerCtr = 0; outerCtr &#x3C; 4; outerCtr++) {
 
-    for(let innerCtr = 0; innerCtr &lt;= 8 - outerCtr; innerCtr++) {
+    for(let innerCtr = 0; innerCtr &#x3C;= 8 - outerCtr; innerCtr++) {
 
-      if(row &lt;= outerCtr &amp;&amp; col &gt; 4 + outerCtr &amp;&amp; col &lt;= 12) return false; // upper middle
-      if(row &lt; 12 - outerCtr &amp;&amp; col &gt;= 16 - outerCtr) return false; // right middle
-      if(row &gt;= 16 - outerCtr &amp;&amp; col &gt;= 4 &amp;&amp; col &lt; 12 - outerCtr) return false; // lower middle
-      if(row &gt; 4 + outerCtr &amp;&amp; col &lt;= outerCtr) return false; // left middle
+      if(row &#x3C;= outerCtr &#x26;&#x26; col &#x3E; 4 + outerCtr &#x26;&#x26; col &#x3C;= 12) return false; // upper middle
+      if(row &#x3C; 12 - outerCtr &#x26;&#x26; col &#x3E;= 16 - outerCtr) return false; // right middle
+      if(row &#x3E;= 16 - outerCtr &#x26;&#x26; col &#x3E;= 4 &#x26;&#x26; col &#x3C; 12 - outerCtr) return false; // lower middle
+      if(row &#x3E; 4 + outerCtr &#x26;&#x26; col &#x3C;= outerCtr) return false; // left middle
     }
   }
   return true;
@@ -758,19 +758,19 @@ function inBounds(row, col) {
 
 function endZone(row, col) {
 
-  for(let outerCtr = 0; outerCtr &lt; 4; outerCtr++) {
+  for(let outerCtr = 0; outerCtr &#x3C; 4; outerCtr++) {
 
-    for(let innerCtr = 0; innerCtr &lt;= outerCtr; innerCtr++) {
+    for(let innerCtr = 0; innerCtr &#x3C;= outerCtr; innerCtr++) {
 
       // End zones numbered by the player across the board
       // e.g. player 1 starts in end zone 4 and vice versa
 
-      if(row == 16 - outerCtr &amp;&amp; col == 12 - innerCtr) return 1;
-      if(row == 12 - outerCtr + innerCtr &amp;&amp; col == innerCtr + 4) return 2;
-      if(row == innerCtr + 4 &amp;&amp; col == outerCtr) return 3;
-      if(row == outerCtr &amp;&amp; col == innerCtr + 4) return 4;
-      if(row == innerCtr + 4 &amp;&amp; col == 12 - outerCtr + innerCtr) return 5;
-      if(row == 12 - innerCtr &amp;&amp; col == 16 - outerCtr) return 6;
+      if(row == 16 - outerCtr &#x26;&#x26; col == 12 - innerCtr) return 1;
+      if(row == 12 - outerCtr + innerCtr &#x26;&#x26; col == innerCtr + 4) return 2;
+      if(row == innerCtr + 4 &#x26;&#x26; col == outerCtr) return 3;
+      if(row == outerCtr &#x26;&#x26; col == innerCtr + 4) return 4;
+      if(row == innerCtr + 4 &#x26;&#x26; col == 12 - outerCtr + innerCtr) return 5;
+      if(row == 12 - innerCtr &#x26;&#x26; col == 16 - outerCtr) return 6;
     }
   }
   return null;
@@ -782,7 +782,7 @@ function blastConfetti() {
     particleCount: 150,
     spread: 100,
     origin: { y: 0.7 },
-    colors: $('#progress-tracker th.player-' + game.winner).css('background-color')
+    colors: $(&#x27;#progress-tracker th.player-&#x27; + game.winner).css(&#x27;background-color&#x27;)
   });
 }
 
@@ -790,12 +790,12 @@ function activateBlastSeries() {
 
   let numBlasts = 5, blastCtr = 0;
 
-  blastConfetti(); // immediate blast (setInterval's 1st iteration is delayed)
+  blastConfetti(); // immediate blast (setInterval&#x27;s 1st iteration is delayed)
   blastCtr++;
 
   let interval_ID = setInterval(function() {
 
-    if(blastCtr++ &lt; numBlasts) {
+    if(blastCtr++ &#x3C; numBlasts) {
       blastConfetti();
     }
     else {
