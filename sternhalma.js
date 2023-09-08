@@ -2,7 +2,7 @@
  * Sternhalma
  * @author Stepan Fyodorovic
  * @description Sternhalma aka Chinese Checkers (1 human vs 5 AI)
- * @version 1.5.2
+ * @version v1.0.0
  */
 
 let game; // state of game
